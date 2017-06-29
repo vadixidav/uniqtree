@@ -3,7 +3,7 @@
 use std::cmp::max;
 use std::collections::HashMap;
 
-#[derive(Debug, Hash)]
+#[derive(Debug, Hash, Default)]
 struct Tree {
     nodes: [Option<Box<Tree>>; 2],
 }
@@ -73,9 +73,106 @@ impl Tree {
             [None, None] => Tree { nodes: [None, None] },
         }
     }
+
+    /// Increment the binary tree to the next iteration and return the carry.
+    /// The `depth` represents the maximum depth that can be reached on the left before the right must get incremented.
+    fn inc(&mut self, depth: usize) -> bool {
+        let mut right_try_carry = false;
+        let mut right_create = false;
+        let mut left_create = false;
+        if depth == 0 {
+            return true;
+        } else {
+            match self.nodes {
+                [Some(ref mut l), Some(_)] => {
+                    if l.inc(depth - 1) {
+                        right_try_carry = true;
+                    }
+                }
+                [Some(ref mut l), None] => {
+                    if l.inc(depth - 1) {
+                        right_create = true;
+                    }
+                }
+                [None, None] => {
+                    left_create = true;
+                }
+                _ => panic!("error: found improper sub-tree {:?}", self),
+            }
+        }
+        if right_create {
+            self.nodes[1] = Some(Default::default());
+            false
+        } else if left_create {
+            self.nodes[0] = Some(Default::default());
+            false
+        } else if right_try_carry {
+            self.nodes[1].as_mut().unwrap().inc(depth - 1)
+        } else {
+            false
+        }
+    }
+}
+
+#[derive(Debug)]
+struct TreeIterator {
+    current: Tree,
+    depth: usize,
+}
+
+impl Iterator for TreeIterator {
+    type Item = Tree;
+
+    fn next(&mut self) -> Option<Tree> {
+        let out = self.current.clone();
+        println!("Got out {:?}", out);
+        if self.current.inc(self.depth) {
+            println!("After first inc({}) {:?}", self.depth, self.current);
+            self.depth += 1;
+            self.current.inc(self.depth);
+            println!("After second inc({}) {:?}", self.depth, self.current);
+        } else {
+            println!("After first inc({}) {:?}", self.depth, self.current);
+        }
+        Some(out)
+    }
+}
+
+impl TreeIterator {
+    fn new() -> TreeIterator {
+        TreeIterator {
+            current: Tree::default(),
+            depth: 0,
+        }
+    }
 }
 
 fn main() {
-    
+    let mut it = TreeIterator::new();
+    println!("inside: {:?}", it);
+    println!("next tree: {:?}", it.next());
+    println!("inside: {:?}", it);
+    println!("next tree: {:?}", it.next());
+    println!("inside: {:?}", it);
+    println!("next tree: {:?}", it.next());
+    println!("inside: {:?}", it);
+    println!("next tree: {:?}", it.next());
+    // let mut tree = Tree::default();
+    // println!("{:?}", tree);
+    // let dep = 0;
+    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
+    // println!("{:?}", tree);
+    // let dep = 1;
+    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
+    // println!("{:?}", tree);
+    // let dep = 1;
+    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
+    // println!("{:?}", tree);
+    // let dep = 1;
+    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
+    // println!("{:?}", tree);
+    // let dep = 2;
+    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
+    // println!("{:?}", tree);
 }
 
