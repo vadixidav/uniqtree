@@ -171,7 +171,9 @@ fn main() {
         }
     }
     for (ix, tree) in unique_vec.iter().enumerate() {
-        println!("{}: {:?}", ix, tree);
+        print!("{}: ", ix);
+        tree.print_simple();
+        println!();
     }
 }
 
