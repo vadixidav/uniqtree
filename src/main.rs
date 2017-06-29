@@ -161,9 +161,17 @@ impl TreeIterator {
 }
 
 fn main() {
-    for tree in TreeIterator::new().take(20) {
-        tree.print_simple();
-        println!();
+    let mut unique_map = HashMap::new();
+    let mut unique_vec = Vec::new();
+    for tree in TreeIterator::new().take(50) {
+        let unique = tree.unique_isomorphic(&unique_map);
+        let uid = unique_map.len();
+        if unique_map.insert(unique.clone(), uid).is_none() {
+            unique_vec.push(unique);
+        }
+    }
+    for (ix, tree) in unique_vec.iter().enumerate() {
+        println!("{}: {:?}", ix, tree);
     }
 }
 
