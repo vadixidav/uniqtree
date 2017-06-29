@@ -10,7 +10,7 @@ struct Tree {
 
 impl Clone for Tree {
     fn clone(&self) -> Self {
-        Tree { nodes: [self.nodes[0].clone(), self.nodes[0].clone()] }
+        Tree { nodes: [self.nodes[0].clone(), self.nodes[1].clone()] }
     }
 }
 
@@ -107,10 +107,28 @@ impl Tree {
             self.nodes[0] = Some(Default::default());
             false
         } else if right_try_carry {
-            self.nodes[1].as_mut().unwrap().inc(depth - 1)
+            if self.nodes[1].as_mut().unwrap().inc(depth - 1) {
+                self.nodes[1] = None;
+                true
+            } else {
+                false
+            }
         } else {
             false
         }
+    }
+
+    /// Prints the tree in simple form.
+    fn print_simple(&self) {
+        print!("{{");
+        if let Some(ref n) = self.nodes[0] {
+            n.print_simple();
+        }
+        print!(",");
+        if let Some(ref n) = self.nodes[1] {
+            n.print_simple();
+        }
+        print!("}}");
     }
 }
 
@@ -125,14 +143,9 @@ impl Iterator for TreeIterator {
 
     fn next(&mut self) -> Option<Tree> {
         let out = self.current.clone();
-        println!("Got out {:?}", out);
         if self.current.inc(self.depth) {
-            println!("After first inc({}) {:?}", self.depth, self.current);
             self.depth += 1;
             self.current.inc(self.depth);
-            println!("After second inc({}) {:?}", self.depth, self.current);
-        } else {
-            println!("After first inc({}) {:?}", self.depth, self.current);
         }
         Some(out)
     }
@@ -148,31 +161,9 @@ impl TreeIterator {
 }
 
 fn main() {
-    let mut it = TreeIterator::new();
-    println!("inside: {:?}", it);
-    println!("next tree: {:?}", it.next());
-    println!("inside: {:?}", it);
-    println!("next tree: {:?}", it.next());
-    println!("inside: {:?}", it);
-    println!("next tree: {:?}", it.next());
-    println!("inside: {:?}", it);
-    println!("next tree: {:?}", it.next());
-    // let mut tree = Tree::default();
-    // println!("{:?}", tree);
-    // let dep = 0;
-    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
-    // println!("{:?}", tree);
-    // let dep = 1;
-    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
-    // println!("{:?}", tree);
-    // let dep = 1;
-    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
-    // println!("{:?}", tree);
-    // let dep = 1;
-    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
-    // println!("{:?}", tree);
-    // let dep = 2;
-    // println!("inc({:?}): {:?}", dep, tree.inc(dep));
-    // println!("{:?}", tree);
+    for tree in TreeIterator::new().take(20) {
+        tree.print_simple();
+        println!();
+    }
 }
 
