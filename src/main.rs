@@ -130,6 +130,28 @@ impl Tree {
         }
         print!("}}");
     }
+
+    /// Prints the tree in fancy form.
+    fn print_fancy(&self, depth: usize) {
+        for _ in 0..depth {
+            print!("\t");
+        }
+        if self.nodes.iter().all(Option::is_none) {
+            println!("*");
+            return;
+        }
+        println!("1->");
+        if let Some(ref n) = self.nodes[0] {
+            n.print_fancy(depth + 1);
+        }
+        for _ in 0..depth {
+            print!("\t");
+        }
+        println!("2->");
+        if let Some(ref n) = self.nodes[1] {
+            n.print_fancy(depth + 1);
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -171,8 +193,8 @@ fn main() {
         }
     }
     for (ix, tree) in unique_vec.iter().enumerate() {
-        print!("{}: ", ix);
-        tree.print_simple();
+        println!("{}: ", ix);
+        tree.print_fancy(0);
         println!();
     }
 }
