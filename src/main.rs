@@ -144,11 +144,11 @@ impl Tree {
         if let Some(ref n) = self.nodes[0] {
             n.print_fancy(depth + 1);
         }
-        for _ in 0..depth {
-            print!("\t");
-        }
-        println!("2->");
         if let Some(ref n) = self.nodes[1] {
+            for _ in 0..depth {
+                print!("\t");
+            }
+            println!("2->");
             n.print_fancy(depth + 1);
         }
     }
