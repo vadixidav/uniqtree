@@ -182,17 +182,37 @@ impl TreeIterator {
     }
 }
 
-fn main() {
-    let mut unique_map = HashMap::new();
-    let mut unique_vec = Vec::new();
-    for tree in TreeIterator::new().take(50) {
-        let unique = tree.unique_isomorphic(&unique_map);
-        let uid = unique_map.len();
-        if unique_map.insert(unique.clone(), uid).is_none() {
-            unique_vec.push(unique);
+#[derive(Debug)]
+struct UniqueTreeIterator {
+    unique_map: HashMap<Tree, usize>,
+    tree_iter: TreeIterator,
+}
+
+impl Iterator for UniqueTreeIterator {
+    type Item = Tree;
+
+    fn next(&mut self) -> Option<Tree> {
+        let uid = self.unique_map.len();
+        let unique_map = &mut self.unique_map;
+        self.tree_iter
+            .find(|t| {
+                let t = t.unique_isomorphic(unique_map);
+                unique_map.insert(t.clone(), uid).is_none()
+            })
+    }
+}
+
+impl UniqueTreeIterator {
+    fn new() -> UniqueTreeIterator {
+        UniqueTreeIterator {
+            unique_map: HashMap::new(),
+            tree_iter: TreeIterator::new(),
         }
     }
-    for (ix, tree) in unique_vec.iter().enumerate() {
+}
+
+fn main() {
+    for (ix, tree) in UniqueTreeIterator::new().take(100).enumerate() {
         println!("{}: ", ix);
         tree.print_fancy(0);
         println!();
